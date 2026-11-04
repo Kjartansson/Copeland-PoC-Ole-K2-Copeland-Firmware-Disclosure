@@ -38,6 +38,7 @@ not interchangeable. Personal remote-device artifacts are excluded.
 | [PoC22](PoC22_XWEB_EVO_backup_password_injection.md) | Backup OpenSSL password command injection | i686 Administrator canary and success response |
 | [PoC23](PoC23_XWEB_EVO_restore_server_credential_injection.md) | Restore-server username/password command injection | ARM and i686 with restore-only role; no-session controls passed |
 | [PoC24](PoC24_XWEB_EVO_factory_password_reset.md) | Factory-state unauthenticated superadmin password reset | ARM and i686; new login, negative controls, and cleanup passed |
+| [PoC25](PoC25_XWEB_EVO_SSH_web_persistence.md) | Public sysinfo → API SSH start → root SSH canary → lab web account → SSH stop → privileged web login | Complete network-disabled Docker/QEMU chain; synthetic account and no physical controller |
 
 ## Excluded or unresolved
 

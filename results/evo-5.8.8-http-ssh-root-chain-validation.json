@@ -1,0 +1,24 @@
+{
+  "scope": "Actual EVO 5.8.8 Lighttpd/Lua and Dropbear in one network-disabled Docker/QEMU ARM lab",
+  "public_sysinfo_id": "001122334455",
+  "api_ssh_start": {
+    "SSH": "start"
+  },
+  "root_output": "uid=0(root) gid=0(root) groups=0(root)\r\nLAB_USER_CREATED",
+  "root_canary_validated": true,
+  "lab_user_created_over_ssh": true,
+  "api_ssh_stop": {
+    "SSH": "stop"
+  },
+  "lab_user_login_after_ssh_stop": "ok",
+  "lab_user_id": 2,
+  "lab_profile_id": 99,
+  "privileged_user_info_validated": true,
+  "validated": true,
+  "limitations": [
+    "No physical controller or external network was used",
+    "MAC, credentials, account, and profile are synthetic lab-only values",
+    "The lab user is a full-permission regular account, not the special Administrator account",
+    "Physical device firewall and service behavior remain unverified"
+  ]
+}

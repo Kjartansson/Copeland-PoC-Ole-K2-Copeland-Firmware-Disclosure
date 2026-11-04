@@ -1,0 +1,14 @@
+{
+  "scope": "Actual EVO 5.8.8 Dropbear 2022.83 in a network-disabled Docker/QEMU ARM lab with synthetic account data",
+  "container_network": "none",
+  "server": "127.0.0.1:12222 inside the disposable container",
+  "credential": "Documentation-only synthetic daily root credential",
+  "password_authentication_validated": true,
+  "shell_validated": true,
+  "root_canary_validated": true,
+  "command_output": "uid=0(root) gid=0(root) groups=0(root)\r\nEVO_SSH_ROOT_CANARY",
+  "client_exit_status": 0,
+  "client_signal": null,
+  "client_log": "build/evo-dropbear-runtime/client.log",
+  "remaining_limitation": "No physical controller or external network was used; device firewall and service reachability remain unverified"
+}

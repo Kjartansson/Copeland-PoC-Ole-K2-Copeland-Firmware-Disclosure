@@ -3,22 +3,26 @@
 - Related analysis report: `analysis/XWEB-EVO-5.2.3.md`
 - Related CVE (if any): new chain candidate; no assignment or public overlap established
 - Product / version: XWEB EVO 5.8.7 and 5.8.8 ARM, recovered official packages
-- Status: public-MAC and API start/stop behavior verified with actual Lua in isolated ARM runtime; physical root SSH login not performed
+- Status: public-MAC disclosure, API start/stop, real Dropbear authentication, and a root-shell canary verified in isolated ARM runtimes; physical-controller access not performed
 
 ## Summary
 
 EVO 5.8.7 and 5.8.8 expose the controller MAC address without a session. Their
 API accepts that MAC-derived daily password to start the SSH service without a
 web session. A daily cron script sets the Unix root password to `xwebdix` plus
-the same daily code. These components form a potential unauthenticated remote
-root-access chain when the API and SSH port are reachable.
+the same daily code. In the network-disabled Docker/QEMU lab, the recovered
+Dropbear accepted the synthetic daily credential and executed a root `id` and
+file-write canary. These components form an unauthenticated remote root-access
+chain when the API and SSH port are reachable on a controller.
 
 ## Constraints
 
-- Actual vendor Lua/API behavior and credential derivation were validated in an
-  isolated runtime. No physical controller or external network was contacted.
-- A complete physical SSH login and reachability of the SSH port after service
-  startup remain unverified.
+- Offline analysis and isolated runtimes only. No physical controller or
+  third-party address was contacted.
+- The API service-start test and Dropbear root-shell test were separate
+  component validations, not one physical end-to-end request sequence.
+- Device firewall behavior, service startup timing, and network reachability
+  remain unverified.
 - The daily code is device- and date-specific. Do not use the example MAC or
   code against another controller.
 
@@ -76,6 +80,27 @@ under QEMU with `-k 001122334455`, matching the corrected Python implementation.
 EVO 5.8.7 contains the same public-MAC, `action=ssh`, and root-password logic.
 EVO 5.2.3 does not expose `action=ssh` in its recovered `api.lua`, so this exact
 chain is not claimed for that version.
+
+### 5. Actual Dropbear root-shell canary
+
+`lab/evo-arm-dropbear-canary.py` starts the recovered Dropbear 2022.83 in a
+network-disabled Docker/QEMU ARM container with synthetic account data and a
+documentation-only credential. The real SSH service accepted the password and
+returned:
+
+```text
+uid=0(root) gid=0(root) groups=0(root)
+EVO_SSH_ROOT_CANARY
+```
+
+The fixed canary was also verified in the scratch filesystem. The container was
+removed after the test. Machine-readable evidence:
+`results/evo-5.8.8-dropbear-shell-validation.json`.
+
+The combined follow-on harness `lab/evo-arm-ssh-chain-canary.py` also verifies
+API-driven SSH start/stop and creation of a persistent lab web account in one
+sequence. See `poc/PoC25_XWEB_EVO_SSH_web_persistence.md` and
+`results/evo-5.8.8-http-ssh-root-chain-validation.json`.
 
 ## Reproduction steps
 

@@ -3,11 +3,13 @@
 ## Result
 
 The actual recovered 5.8.8 `api.lua` and `sysinfo.lua` were executed in an
-isolated ARM bubblewrap/QEMU environment. The API-level chain is now verified;
-only physical-device SSH connectivity remains untested.
+isolated ARM bubblewrap/QEMU environment. The recovered Dropbear was also tested
+in a network-disabled Docker/QEMU ARM container. Public MAC disclosure, API
+start/stop, password authentication, and a root-shell canary are now verified as
+components. Physical-device connectivity and a single end-to-end request
+sequence remain untested.
 
-No external network request was made and no physical controller was contacted;
-all execution stayed inside the isolated runtime.
+No external network request was made and no controller was contacted.
 
 ## Environment
 
@@ -73,28 +75,49 @@ stop
 This verifies real password comparison, action dispatch, and init-script
 execution in the recovered API code.
 
-## Actual Dropbear password authentication
+## Actual Dropbear authentication and root shell
 
-The recovered Dropbear 2022.83 service was also started on `127.0.0.1:2222`
-with a synthetic root account and host key. With the documentation-only password
-`xwebdixO0ANI3`, the service log recorded:
+The first bubblewrap test verified password authentication but could not change
+groups in its restricted user namespace. The replacement
+`lab/evo-arm-dropbear-canary.py` uses a disposable Docker container with
+`--network none`, the recovered ARM rootfs, static QEMU, synthetic account data,
+and a fixed host key. It does not alter Dropbear or its authentication logic.
+
+With the documentation-only password `xwebdixO0ANI3`, the genuine Dropbear
+2022.83 service completed authentication, executed the requested shell command,
+and returned:
 
 ```text
-Password auth succeeded for 'root' from 127.0.0.1
+uid=0(root) gid=0(root) groups=0(root)
+EVO_SSH_ROOT_CANARY
 ```
 
-See `results/evo-5.8.8-dropbear-auth-validation.json`. A local user-namespace
-group-mapping error prevented the subsequent shell session. This verifies the
-credential with the real SSH service but not command execution or device network
-reachability.
+The canary was independently read from the scratch filesystem and the container
+was removed. See `results/evo-5.8.8-dropbear-shell-validation.json` and
+`build/evo-dropbear-runtime/`. This verifies the credential, real SSH service,
+root shell, and file-write primitive in the isolated runtime.
+
+## Combined HTTP-to-SSH and web-persistence sequence
+
+`lab/evo-arm-ssh-chain-canary.py` joins the components in one network-disabled
+container. The actual `sysinfo.lua` returns the synthetic public MAC, `api.lua`
+starts Dropbear, and the real SSH service returns a root `id` and canary. The
+root shell creates a lab-only user and full-permission profile with the vendor's
+JSON schema. After `api.lua` stops Dropbear, the new account logs in through
+`login.lua` and reads privileged account information through `users.lua`.
+
+Evidence: `results/evo-5.8.8-http-ssh-root-chain-validation.json` and
+`poc/PoC25_XWEB_EVO_SSH_web_persistence.md`. This is post-exploitation
+persistence, not an independent account-creation bypass. The new account is a
+full-permission regular user, not the special `Administrator` account.
 
 ## Remaining device-only gaps
 
 - No physical root SSH login or command execution has been performed.
 - Firewall behavior, service startup timing, and exact device MAC/date remain
   runtime properties.
-- This is stronger evidence than static analysis and password-only emulation,
-  but it is not yet a physical end-to-end exploit demonstration.
+- This is a verified isolated HTTP-to-SSH and web-persistence chain, not a claim
+  of access to a production controller or XWEB Pro.
 
 ## Next safe validation
 

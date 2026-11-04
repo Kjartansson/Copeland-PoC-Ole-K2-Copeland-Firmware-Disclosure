@@ -1,0 +1,54 @@
+{
+  "scope": "Official public Copeland XWEB Pro 1.16.1 artifacts and public research; offline analysis only",
+  "acquired": "2026-11-03",
+  "catalog_release_date": "2026-10-29",
+  "packages": [
+    {
+      "model": "XWEB300D/500D Pro",
+      "path": "firmware/related/XWEB_PRO_xw500d_standard.1.16.1_LIB20261016.update.xweb",
+      "sha256": "7571a9e337fe794e79a09bc57ee92855998fa365cb1ca567649a43652c864cf8",
+      "signatures_verified": 7,
+      "payload_components": ["rootfs", "xweb", "www", "kernel", "libraries", "manifest"]
+    },
+    {
+      "model": "XWEB500B/Coolmate Pro",
+      "path": "firmware/related/XWEB_PRO_xwcoolmate_standard.1.16.1_LIB20261016.update.xweb",
+      "sha256": "b11a47a54a6ceba1ded517cf72c99e0011736316d8a8ba8d5b9fa3847cc6e534",
+      "signatures_verified": 7,
+      "payload_components": ["rootfs", "xweb", "www", "kernel", "libraries", "manifest"]
+    },
+    {
+      "model": "XWEB1000D Pro",
+      "path": "firmware/related/XWEB_PRO_xw1000d_standard.1.16.1_LIB20261016.update.xweb",
+      "sha256": "a40c60db42104351bafa36fb8760b5e660bf8ad0197788f2cc4700725b814d0a",
+      "signatures_verified": 6,
+      "payload_components": ["rootfs", "xweb", "www", "libraries", "manifest"]
+    }
+  ],
+  "release_notes": {
+    "path": "firmware/reference/Changelog_XWEB-PRO_v.1.16.1_EN.pdf",
+    "sha256": "c3ebf54020aef2816bc2ac856ec83b2848abd8beaa83b6a33b3eac8611877262"
+  },
+  "all_payloads_openssl_salted": true,
+  "public_rsa_key_recovery_succeeded": false,
+  "plaintext_updater_recovered": false,
+  "gpu_dictionary_tests": {
+    "construction": "EVP_BytesToKey-SHA256 + AES-256-CBC",
+    "targets": [
+      "extracted/XWEB_PRO_xw500d_1.16.1/manifest",
+      "extracted/XWEB_PRO_xwcoolmate_1.16.1/manifest",
+      "extracted/XWEB_PRO_xw1000d_1.16.1/manifest"
+    ],
+    "operations_per_manifest": 38022809,
+    "claroty_visible_candidates_per_manifest": 5,
+    "operations_total": 114068442,
+    "validated_hits": 0
+  },
+  "public_research": {
+    "github_pro_updater_or_decoder_found": false,
+    "vendor_utility_found": false,
+    "claroty_architecture": ["Lighttpd", "Lua middleware", "SSH", "Shellinabox", "RS485 Modbus"],
+    "claroty_url": "https://claroty.com/team82/research/chilling-discoveries-unpacking-vulnerabilities-in-copeland-xweb-pro-controllers"
+  },
+  "next_decisive_artifact": "Pro updater executable, recovery/base image, or equivalent authorized runtime; no physical device is available"
+}

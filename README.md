@@ -43,6 +43,10 @@ See the [complete PoC index](poc/README.md).
 - **Factory first-login reset:** an unauthenticated factory-state password reset
   created a working superadmin credential on both architectures, with negative
   controls and cleanup ([PoC24](poc/PoC24_XWEB_EVO_factory_password_reset.md)).
+- **SSH-to-web persistence:** public sysinfo, API-driven SSH start, real Dropbear
+  root execution, and a lab-only full-permission account were chained in one
+  network-disabled runtime. SSH was stopped before the account's privileged web
+  login succeeded ([PoC25](poc/PoC25_XWEB_EVO_SSH_web_persistence.md)).
 - **OTA update-time execution:** a marker package was retrieved, decoded,
   unpacked, and executed in the isolated runtime; real firmware writes and
   reboot paths were not exercised ([OTA analysis](analysis/XWEB-EVO-5.8.8-OTA.md)).

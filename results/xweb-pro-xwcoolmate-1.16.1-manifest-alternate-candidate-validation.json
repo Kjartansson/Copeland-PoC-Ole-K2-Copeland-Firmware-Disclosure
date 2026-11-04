@@ -1,0 +1,9 @@
+{
+  "password": "670948",
+  "cipher": "des-ede3-cbc",
+  "kdf": "evp-md5",
+  "validated": false,
+  "plaintext_sha256": "2f1b797843bafc765445398973f5848fbb0b3d69ce4402f66f93374d9894484a",
+  "prefix_hex": "1f8b08b9ac5097a18cea4cc48c47e3cd4bea468c38ddbcc68a2876e636779b9a",
+  "validation": "rejected:error: Error -3 while decompressing data: invalid block type"
+}
