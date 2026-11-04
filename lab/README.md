@@ -19,6 +19,9 @@ These are not full hardware or refrigeration-controller simulations.
   API SSH start → root SSH canary → lab web-account creation → API SSH stop →
   privileged web-login sequence. Account files are created only in scratch
   storage and the container is removed.
+- `EVO_MBIRD_TEST=1 python3 lab/evo-arm-ssh-chain-canary.py` verifies the
+  MessageBird settings-edit command-injection path with an Administrator-terminal
+  negative control and a root `id` canary.
 
 Dropbear evidence is written to
 `results/evo-5.8.8-dropbear-shell-validation.json`; service and client logs are

@@ -47,6 +47,10 @@ See the [complete PoC index](poc/README.md).
   root execution, and a lab-only full-permission account were chained in one
   network-disabled runtime. SSH was stopped before the account's privileged web
   login succeeded ([PoC25](poc/PoC25_XWEB_EVO_SSH_web_persistence.md)).
+- **Settings-edit to root command execution:** a stored MessageBird URL triggered
+  shell injection in the actual ARM handler. The regular account was denied the
+  Administrator terminal but produced a canary and `uid=0(root)` output
+  ([PoC26](poc/PoC26_XWEB_EVO_mbird_command_injection.md)).
 - **OTA update-time execution:** a marker package was retrieved, decoded,
   unpacked, and executed in the isolated runtime; real firmware writes and
   reboot paths were not exercised ([OTA analysis](analysis/XWEB-EVO-5.8.8-OTA.md)).

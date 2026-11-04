@@ -1,0 +1,22 @@
+{
+  "scope": "Actual EVO 5.8.8 handlers in a network-disabled Docker/QEMU ARM lab",
+  "regular_user_id": 2,
+  "regular_profile_id": 99,
+  "administrator_terminal_denied": {
+    "status": "error",
+    "error": "PERMISSION_DENIED"
+  },
+  "settings_edit_response": {
+    "status": "ok"
+  },
+  "injection_field": "Sms/MbirdBal",
+  "trigger_action": "mbirdbalance",
+  "canary_content": "EVO_MBIRD_CANARY",
+  "command_output": "uid=0(root) gid=0(root) groups=0(root)",
+  "validated": true,
+  "limitations": [
+    "No physical controller or external network was used",
+    "The account and profile are synthetic and the user is not Administrator",
+    "Physical device privileges and reachability remain unverified"
+  ]
+}
