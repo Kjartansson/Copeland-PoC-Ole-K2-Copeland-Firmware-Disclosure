@@ -17,7 +17,7 @@ catalog still listed 1.15.1 as its newest package in the same response.
 | XWEB300D/500D Pro 1.16.1 | 41,992,780 bytes | `7571a9e337fe794e79a09bc57ee92855998fa365cb1ca567649a43652c864cf8` |
 | XWEB500B/Coolmate Pro 1.16.1 | 43,735,372 bytes | `b11a47a54a6ceba1ded517cf72c99e0011736316d8a8ba8d5b9fa3847cc6e534` |
 | XWEB1000D Pro 1.16.1 | 37,647,536 bytes | `a40c60db42104351bafa36fb8760b5e660bf8ad0197788f2cc4700725b814d0a` |
-| 1.16.1 release notes | 318,514 bytes | `c3ebf54020aef2816bc2ac856ec83b2848abd8beaa83b6a33b3eac8611877262` |
+| 1.16.1 release notes | 318,485 bytes | `c3ebf54020aef2816bc2ac856ec83b2848abd8beaa83b6a33b3eac8611877262` |
 
 Packages are under `firmware/related/`; extracted members are under
 `extracted/XWEB_PRO_xw500d_1.16.1/`,
@@ -156,17 +156,15 @@ does not expose an updater executable or additional download URL
 
 The 1.13–1.16.1 notes add API v2 library-update and system-log endpoints, JSON
 Data Push, DNS/LDAP/custom-URL network tools, and custom update-server
-credentials. These are concrete SSRF, injection, authorization, and
-credential-handling review targets if plaintext services become available;
-they are not runtime findings.
+credentials. These statements are sourced from release notes, not runtime
+findings.
 
 Public CVE material for 1.12.1 and earlier identifies unauthenticated arbitrary
 file read (`CVE-2026-22877`), API stack corruption (`CVE-2026-20797`), and
-library-install command injection (`CVE-2026-24663`). On an older runtime, the
-file-read class would be especially relevant to updater/key exposure. No
-physical target is available and no vulnerability is claimed against 1.16.1.
+library-install command injection (`CVE-2026-24663`). These are public CVE
+references, not Ole-k2 discoveries and not claims against 1.16.1.
 
-## Release-note leads for future PoCs
+## Evidence boundary
 
 The official 1.16.1 notes identify strengthened authentication and account
 protection, stricter role-based access controls, improved system-configuration
@@ -174,16 +172,6 @@ validation, and safer file/package/backup handling. They also say API v1 will be
 removed from releases after July 2027 and that API v2 is already available with
 improved security.
 
-Once plaintext is available, the highest-value comparisons are:
-
-1. API v1 versus v2 authentication and role-enforcement paths, including Bearer
-   token error handling.
-2. Backup/package filename, archive-member, signature, and compatibility checks.
-3. Configuration-validation enforcement and any remaining unauthenticated write.
-4. Update-version comparison and acceptance of validly signed older packages.
-5. The data-acquisition memory-leak and crash fixes as availability-only cases,
-   not assumed code-execution primitives.
-
-These are research directions from vendor notes, not demonstrated
-vulnerabilities. The decisive artifact remains a Pro updater executable,
-recovery/base image, owned-device flash dump, or equivalent authorized runtime.
+No Pro plaintext, updater, runtime, private key, or new Pro vulnerability was
+recovered in this assessment. No physical device is available. All exploit and
+emulation claims are limited to the separately documented EVO runtime results.
