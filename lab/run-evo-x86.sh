@@ -10,6 +10,7 @@ QEMU=${QEMU_I386:-/usr/bin/qemu-i386}
 [[ -x "$QEMU" ]] || { echo "missing qemu-i386: $QEMU" >&2; exit 1; }
 
 CURL="$RUN/curl"
+mkdir -p "$RUN/opt-log"
 
 BWRAP=(bwrap
   --unshare-net --unshare-pid --unshare-uts --unshare-ipc --die-with-parent
@@ -27,12 +28,18 @@ BWRAP=(bwrap
   --ro-bind /lib/i386-linux-gnu/ld-linux.so.2 /lib/ld-linux.so.2
   --ro-bind /lib/i386-linux-gnu /lib/i386-linux-gnu
   --ro-bind /usr/lib/i386-linux-gnu /usr/lib/i386-linux-gnu
+  --ro-bind /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
+  --ro-bind /lib/x86_64-linux-gnu /lib/x86_64-linux-gnu
+  --ro-bind /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
+  --ro-bind "$REPO/build/msmtp-host/usr/bin/msmtp" /usr/bin/msmtp
+  --ro-bind "$REPO/build/msmtp-host/usr/lib/x86_64-linux-gnu" /opt/msmtp-lib
   --dir /opt/evo-compat
   --ro-bind "$REPO/build/evo-lua-x86/root/lib/i386-linux-gnu" /opt/evo-compat/lib
   --ro-bind "$REPO/build/evo-lua-x86/root/usr/lib/i386-linux-gnu" /opt/evo-compat/usr-lib
-  --setenv LD_LIBRARY_PATH /opt/evo-compat/lib:/opt/evo-compat/usr-lib:/lib/i386-linux-gnu:/usr/lib/i386-linux-gnu:/lib:/usr/lib
+  --setenv LD_LIBRARY_PATH /opt/evo-compat/lib:/opt/evo-compat/usr-lib:/lib/i386-linux-gnu:/usr/lib/i386-linux-gnu:/lib:/usr/lib:/opt/msmtp-lib
   --proc /proc --dev /dev
   --bind "$RUN/opt-tmp" /opt/tmp
+  --bind "$RUN/opt-log" /opt/log
   --bind "$RUN/shm" /dev/shm
   --bind "$RUN/tmp" /tmp
   --bind "$RUN/var-log" /var/log
@@ -55,6 +62,9 @@ BWRAP=(bwrap
   --setenv PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/xweb/bin/tools
 )
 
+if [[ ${EVO_EMAIL_TEST:-0} == 1 ]]; then
+  exec "${BWRAP[@]}" /bin/busybox sh /lab/evo-x86-email-test.sh
+fi
 if [[ ${EVO_RESTORE_TEST:-0} == 1 ]]; then
   exec "${BWRAP[@]}" /bin/busybox sh /lab/evo-x86-restore-test.sh
 fi

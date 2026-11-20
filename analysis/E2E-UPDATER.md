@@ -96,10 +96,11 @@ any decrypted output or access claim. No such hit has occurred.
 ## PlayStation-tool review
 
 The user-supplied PS5 SELF-to-ELF, self-patcher, and PS2 unpacker repositories
-were cloned and inspected statically under `tools/third-party/ps-reference/`;
-nothing was executed or built. Sony SELF uses different containers and keyed
-AES-CTR/CBC constructions, while the PS2 unpacker targets MIPS R5900. None
-matches this i386 VxWorks ELF or SFUB's 8-byte ECB structure. Only the general
+were inspected statically in a separate research workspace and are not
+redistributed here; nothing was executed or built. Sony SELF uses different
+containers and keyed AES-CTR/CBC constructions, while the PS2 unpacker targets
+MIPS R5900. None matches this i386 VxWorks ELF or SFUB's deterministic aligned
+8-byte behavior. Only the general
 PS2 technique of emulating an available unpacker, tracking written memory, and
 dumping the result is transferable as a future method; it requires a runnable
 E3/SS updater and does not supply one.
@@ -120,4 +121,4 @@ per run. No Crunch-derived plaintext is claimed or used for SFUB analysis.
 The E2E code confirms vendor use of Blowfish and supplies a new implementation
 variant to test, but it does not supply an SFUB key or decryptor. Direct SFUB
 progress still requires an E3/SS updater/rootfs, an exact plaintext component
-for ECB pattern matching, or new key-derivation evidence tied to SFUB.
+for block-pattern matching, or new key-derivation evidence tied to SFUB.

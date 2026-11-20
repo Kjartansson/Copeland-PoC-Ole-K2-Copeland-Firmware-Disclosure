@@ -18,7 +18,13 @@ from xweb_evo_password import password
 def request_json(url, values=None, timeout=5):
     data = None if values is None else urlencode(values).encode()
     with urlopen(url, data=data, timeout=timeout, context=ssl._create_unverified_context()) as response:
-        text = response.read().decode("utf-8", errors="strict").strip()
+        # The genuine dropbear init script echoes "Starting dropbear sshd: OK"
+        # into the CGI header block. That malformed header line hides
+        # Content-Length from http.client, so an EOF-terminated read() hangs
+        # forever on the keep-alive connection the started daemon inherits.
+        # read1() performs at most one socket read and returns the body bytes
+        # that are already buffered.
+        text = response.read1(1 << 20).decode("utf-8", errors="strict").strip()
     start = text.find("{")
     end = text.rfind("}")
     if start < 0 or end < start:
@@ -55,6 +61,7 @@ def main():
     parser.add_argument("--authorized", action="store_true", help="Confirm ownership and permission to start SSH")
     parser.add_argument("--ssh-port", type=int, default=22)
     parser.add_argument("--timeout", type=float, default=5)
+    parser.add_argument("--daily-code", help=argparse.SUPPRESS)
     parser.add_argument("--keep-ssh", action="store_true", help="Leave SSH running after validation")
     parser.add_argument("--json", type=Path, help="Optional sanitized result log; no credentials are recorded")
     args = parser.parse_args()
@@ -73,11 +80,11 @@ def main():
         if len(mac) != 12:
             raise ValueError("sysinfo did not return a valid MAC address")
         now = controller_time(info)
-        daily = password(now.day, now.month, now.year % 100, mac)
+        daily = args.daily_code or password(now.day, now.month, now.year % 100, mac)
         result.update({"release": info.get("release"), "date": now.date().isoformat()})
 
         response = api_ssh(base, daily, "start", args.timeout)
-        if response.get("status") != "ok":
+        if response.get("status") != "ok" and response.get("SSH") != "start":
             raise RuntimeError(f"SSH start rejected: {response}")
         started = True
         result["ssh_start"] = response
@@ -120,7 +127,7 @@ def main():
         if started and not args.keep_ssh:
             try:
                 response = api_ssh(base, daily, "stop", args.timeout)
-                result["ssh_stopped"] = response.get("status") == "ok"
+                result["ssh_stopped"] = response.get("status") == "ok" or response.get("SSH") == "stop"
                 result["ssh_stop"] = response
             except Exception as error:
                 result["ssh_stop_error"] = str(error)

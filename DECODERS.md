@@ -127,7 +127,9 @@ x86 decoder, not the XWEB2009 tool.
 The EVO x86 decoder derives the XOR key from each RPM package name, accepts xz
 or gzip payloads, and writes a separate cpio for every RPM. This preserves both
 EVO and FCEVO payloads in combined archives. XWEB3000/5000 EVO 5.8.7 validates
-as 27,728,828-byte EVO and 21,233,756-byte FCEVO cpio outputs.
+as 27,728,828-byte EVO and 21,233,756-byte FCEVO cpio outputs. The newly listed
+5.8.8 package validates as 27,657,552-byte EVO and 21,162,448-byte FCEVO cpio
+outputs, with 995 and 898 safe members respectively.
 
 New reference validations:
 

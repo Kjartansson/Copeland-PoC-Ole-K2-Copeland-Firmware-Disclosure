@@ -10,6 +10,17 @@ These are not full hardware or refrigeration-controller simulations.
 - `./lab/run-evo-x86.sh` runs the EVO 5.8.7 i686 equivalent.
 - `EVO_CONFIG_TEST=1 ./lab/run-evo-arm.sh` runs the ARM configuration-write
   canary. Other `EVO_*_TEST` selectors are defined in the launcher.
+- `./lab/run-evo-x86-5.8.8.sh` runs the newly recovered i686 5.8.8 stack.
+  Supply `EVO_X86_588_ROOT` and a disposable `EVO_X86_588_RUNTIME`, then select
+  `EVO_TEST_SCRIPT=evo-x86-5.8.8-smoke-test.sh`, `...-deps-test.sh`,
+  `...-self-edit-test.sh`, `...-locale-traversal-test.sh`,
+  `...-images-test.sh`, or `...-upload-parser-test.sh`.
+- `EVO_EMAIL_TEST=1 ./lab/run-evo-x86.sh` validates the real `msmtp`
+  configuration-directive injection. The launcher supplies the local `msmtp`
+  compatibility binary and writable log directory.
+- `lab/forged-update/` contains the loopback-only unsigned-update validator.
+  It creates a harmless canary only; no RPM, reboot, firmware write, or external
+  repository is used. See PoC30 for its launcher and cleanup contract.
 - `python3 lab/evo-arm-dropbear-canary.py` starts the recovered Dropbear 2022.83
   in a disposable network-disabled Docker container, authenticates with the
   documentation-only synthetic daily credential, runs `id`, writes a fixed root

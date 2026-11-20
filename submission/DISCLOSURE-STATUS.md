@@ -18,8 +18,22 @@ XWEB EVO models reached End of Support in March 2026 and that no further
 security updates or vulnerability fixes will be released. Copeland recommends
 its published upgrade resources and avoiding direct Internet exposure.
 
+The reply also says: "We appreciate you taking the time to responsibly disclose
+your findings and help improve cybersecurity awareness." This supports the
+repository's educational and defensive purpose. Individual contact details are
+omitted, and no vendor endorsement of exploitation or each later finding is
+claimed.
+
 The additional findings in this repository retain that product boundary. No
 current XWEB Pro or E3/Site Supervisor exploit is claimed.
+
+## 2026-11-20 x86 EVO update
+
+The x86 EVO 5.8.8 self-edit, locale, unsigned-update, image, `doevo.cgi`, and
+native upload-parser results were added at the researcher's direction using the
+same public-release and sanitization rules. Validation remained in isolated
+vendor-code runtimes. No new vendor response, physical-device compromise, or
+current-product impact is implied by this update.
 
 ## Disclosure rules
 

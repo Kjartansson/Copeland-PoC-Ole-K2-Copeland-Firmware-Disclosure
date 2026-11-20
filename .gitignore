@@ -33,6 +33,7 @@ personal*
 *.log
 results/*
 !results/README.md
+!results/VERIFICATION.md
 !results/evo-factory-password-reset.json
 lab/results/
 lab/rootfs/

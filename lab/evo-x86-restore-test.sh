@@ -47,11 +47,12 @@ for attempt in 1 2 3 4 5 6 7 8 9 10; do
   fi
   sleep 1
 done
+EXPECTED_RELEASE=${EVO_EXPECT_RELEASE:-5.8.7.STANDARD.23--f27c2a}
 case "$SYSINFO" in
-  *'"status":"ok"'*'"release":"5.8.7.STANDARD.23--f27c2a"'*) ;;
+  *'"status":"ok"'*'"release":"'"$EXPECTED_RELEASE"'"'*) ;;
   *) echo "FAIL sysinfo: $SYSINFO"; exit 1;;
 esac
-echo "PASS sysinfo unauthenticated release=5.8.7.STANDARD.23--f27c2a"
+echo "PASS sysinfo unauthenticated release=$EXPECTED_RELEASE"
 
 AUTH_RESPONSE=$(post 'action=authenticate&username=RestoreOnly&password=restoreprobe')
 case "$AUTH_RESPONSE" in

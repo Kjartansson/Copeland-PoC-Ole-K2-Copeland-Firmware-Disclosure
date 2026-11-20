@@ -17,6 +17,13 @@ member/server injection, debug backup/restore, download filename, exportpars,
 and backup/restore password paths. `evo_archive_tool_probe.py` checks the
 negative ZIP/TAR containment result using disposable extraction roots.
 
+For x86 5.8.8, supply `EVO_X86_588_ROOT` and `EVO_X86_588_RUNTIME` to
+`run-evo-x86-5.8.8.sh`. Its validators cover service/dependency smoke, self-edit,
+locale traversal, image authorization, and native upload parsing.
+`forged-update/run-forged-update.sh` separately verifies the unsigned update
+command path using a loopback fake repository and a harmless canary, without an
+RPM installation, reboot, firmware write, or external network.
+
 E3/Site Supervisor remains at a different boundary: no executable SFUB runtime
 has been recovered, so there is no honest E3 QEMU smoke test. Do not infer an
 E3 or XWEB Pro exploit from the EVO labs.

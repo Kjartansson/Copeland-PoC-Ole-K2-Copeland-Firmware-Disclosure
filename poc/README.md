@@ -40,6 +40,23 @@ not interchangeable. Personal remote-device artifacts are excluded.
 | [PoC24](PoC24_XWEB_EVO_factory_password_reset.md) | Factory-state unauthenticated superadmin password reset | ARM and i686; new login, negative controls, and cleanup passed |
 | [PoC25](PoC25_XWEB_EVO_SSH_web_persistence.md) | Public sysinfo → API SSH start → root SSH canary → lab web account → SSH stop → privileged web login | Complete network-disabled Docker/QEMU chain; synthetic account and no physical controller |
 | [PoC26](PoC26_XWEB_EVO_mbird_command_injection.md) | Stored MessageBird URL command injection from `settings-edit` to OS command execution | Actual ARM handlers; Administrator terminal denied; canary and `uid=0(root)` output |
+| [PoC27](PoC27_XWEB_EVO_email_config_injection.md) | SMTP `passwordeval` configuration-directive injection | Genuine i686 handler and real msmtp in the isolated lab; service-user execution only |
+
+## New x86 EVO 5.8.8 findings
+
+| PoC | Finding | Evidence boundary |
+|---|---|---|
+| [PoC28](PoC28_XWEB_EVO_self_edit_root_command_injection.md) | Any-account self-edit root command injection | Genuine HTTP handler; other-user/profile denials, root-mapped proof, cleanup |
+| [PoC29](PoC29_XWEB_EVO_locale_traversal.md) | Locale-tag traversal arbitrary `.json` write/delete | Genuine handler with and without `languages-edit` |
+| [PoC30](PoC30_XWEB_EVO_unsigned_update_command_execution.md) | Unsigned update metadata command execution | Genuine updater and loopback fake repository; no RPM/reboot/firmware write |
+| [PoC31](PoC31_XWEB_EVO_image_upload_authorization.md) | Any-account stored SVG/image upload and deletion | Real multipart handler, no-session control, cleanup |
+| [PoC32](PoC32_XWEB_EVO_doevo_xss_specialuser.md) | Script-breakout XSS and forgeable feature token | Genuine `doevo.cgi`; feature token is not a standalone login bypass |
+| [PoC33](PoC33_XWEB_EVO_native_upload_parser.md) | `finalfile` plaintext escape, native crashes, limited pre-auth staging | Genuine native parser; exact session and containment boundaries |
+| [PoC34](PoC34_XWEB_EVO_shared_credentials_tls_key.md) | Shared `dixell:dixell` credential and firmware-wide TLS private key | Static verification in both official trees; no login or TLS interception |
+
+Use `tools/xweb_evo_remote.py list` for remote-safe checks with operator-supplied
+IP/URL and an explicit `--authorized` flag. PoCs that involve firmware updates,
+factory reset, persistence, or destructive filesystem effects remain lab-only.
 
 ## Excluded or unresolved
 

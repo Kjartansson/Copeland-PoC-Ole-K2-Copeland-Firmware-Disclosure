@@ -88,3 +88,11 @@ matching text was generated locally with `pdftotext -layout` for searching.
 Local paths, byte sizes, SHA-256 hashes, extraction outcomes, and third-party
 source links are recorded in `analysis/RELATED-TOOLING.md`. These related files
 are not part of the original six-package `firmware/SHA256SUMS` manifest.
+
+## XWEB3000/5000 EVO 5.8.8 i686
+
+- Catalog: https://webapps.copeland.com/Dixell/Pages/XWEB3000_5000_EVO
+- Package: https://webapps.copeland.com/dixell/Content/Pages/SystemSoftwareUpdate/XWEB30005000-EVO/XWEB_EVO_5.8.8.STANDARD.24-25902d_3000_5000_LIB20241125.zip
+- Size: 25,722,342 bytes.
+- SHA-256: `fda55eef4620bd5e7008febef0c7a3ccf4c22957a53a822a47c62dd89b3ad47c`.
+- Acquired from the live catalog on 2026-11-20. The official archive is not redistributed.

@@ -1,8 +1,9 @@
 # Evidence policy
 
-Only `evo-factory-password-reset.json` is retained here because it is a small,
-reviewed result containing loopback/synthetic data and an explicit statement
-that no physical device was tested.
+Only small, reviewed results containing loopback/synthetic data are retained
+here. Each explicitly states its isolated-lab scope and contains no personal
+remote-device information. `VERIFICATION.md` summarizes the checks performed on
+the exact public copies.
 
 All other raw outputs remain outside this disclosure repository. They may
 contain personal configuration, live sessions, device addresses, account names,
