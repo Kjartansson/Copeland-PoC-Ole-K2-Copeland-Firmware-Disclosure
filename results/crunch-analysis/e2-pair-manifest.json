@@ -1,0 +1,30 @@
+{
+ "package": "firmware/related/E2_3.11F02_Firmware_Update.pkg",
+ "start": 524682,
+ "end": 590336,
+ "streams": [
+  {
+   "offset": 524682,
+   "offset_hex": "0x8018a",
+   "declared": 308280,
+   "declared_probe": 308280,
+   "result": 308280,
+   "produced": 308280,
+   "consumed": 17593,
+   "flags": "0000",
+   "wrapper_accept": true,
+   "sha256": "bfe61348f002f40ecc8bec4d9e8121304d026160741de308371563f595186632",
+   "head16": "424d38b4040000000000360400002800",
+   "index": 0,
+   "class": "binary",
+   "file": "0000_8018a.bin"
+  },
+  {
+   "offset": 542275,
+   "offset_hex": "0x84643",
+   "error": "stream chain ended",
+   "trailing_bytes": 48061,
+   "trailing_hex": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+ ]
+}

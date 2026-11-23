@@ -93,6 +93,9 @@ repository was used.
   `80204568f1ddfe8202f5781657c80c50766f1c2b1070c95c244a1392bf1c7c9f`.
   Both reported the same final-20-byte underrun/wrapper-rejection boundary. The
   recovered image is validated as an i386 VxWorks ELF and is not redistributed.
+  The corrected decoder then accepted all 942 additional streams in the two
+  E2/E2E packages (504 + 436 + 2); manifests and decoder scripts are public,
+  while proprietary decoded outputs remain excluded.
 - `tools/xweb_broad_oracle.py` passed the public self-test and an independent
   OpenSSL positive-control reproduction. The campaign covered 102 Salted__
   components with 1,571,165,262 operations and zero validated hits. Recovered
