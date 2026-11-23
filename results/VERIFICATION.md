@@ -95,7 +95,11 @@ repository was used.
   recovered image is validated as an i386 VxWorks ELF and is not redistributed.
   The corrected decoder then accepted all 942 additional streams in the two
   E2/E2E packages (504 + 436 + 2); manifests and decoder scripts are public,
-  while proprietary decoded outputs remain excluded.
+  while proprietary decoded outputs remain excluded. Static analysis recovered
+  29,365 symbols and identified GoAhead HTTP, `/JSON-RPC`, UltraSite/E2 peer
+  protocols, schema-only unsigned updates, and the signed-byte salted Blowfish
+  family. A Ghidra working copy has only five header bytes zeroed; every LOAD
+  segment remains byte-identical. No SFUB parser or E3/SS access path was found.
 - `tools/xweb_broad_oracle.py` passed the public self-test and an independent
   OpenSSL positive-control reproduction. The campaign covered 102 Salted__
   components with 1,571,165,262 operations and zero validated hits. Recovered
