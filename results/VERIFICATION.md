@@ -85,6 +85,19 @@ repository was used.
 - The OpenSSL/EVP and signed-Blowfish tools compile and expose their usage
   without requiring firmware until an actual research run is requested.
 
+## Crunch recovery and broad-oracle campaign
+
+- `results/crunch-runtime/wrapper_decode_unicorn.py` and the independent
+  qemu-i386 harness produced byte-identical 10,361,268-byte output from the
+  genuine E2E Crunch stream, SHA-256
+  `80204568f1ddfe8202f5781657c80c50766f1c2b1070c95c244a1392bf1c7c9f`.
+  Both reported the same final-20-byte underrun/wrapper-rejection boundary. The
+  recovered image is validated as an i386 VxWorks ELF and is not redistributed.
+- `tools/xweb_broad_oracle.py` passed the public self-test and an independent
+  OpenSSL positive-control reproduction. The campaign covered 102 Salted__
+  components with 1,571,165,262 operations and zero validated hits. Recovered
+  images and raw candidate dumps are excluded from the public evidence set.
+
 ## Shared credential and TLS-key checks
 
 Both official EVO and FCEVO shadow entries verified `dixell:dixell` using their
