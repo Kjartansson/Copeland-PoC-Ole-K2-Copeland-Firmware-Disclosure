@@ -61,22 +61,44 @@ used raw segment extracts `build/crunch-analysis/e2_fw.text.bin`
 ## Account / credential handling (E2 facts)
 
 - Login funnel: `cpcLoginSession` (0xa49fa0) → `AccessServices::GetUserData`
-  (0x89ad10) validates username/password against the user database in system
-  configuration (flash/filesystem), returns access level; on success a
-  `CpcSession` (cookie handle, expiration, per-session username) is added to
-  `CpcSessionList`. `E2.ClientLogin`/`aspClientLogin` feed the same funnel.
-- Passwords in config are numeric 16-bit fields
+  (0x89ad10) validates username/password and returns an access level; on
+  success a `CpcSession` (cookie handle, expiration, per-session username)
+  is added to `CpcSessionList`. Call-site analysis: `cpcLoginSession` has
+  exactly two callers, `JSONRPC_ClientLogin` and `aspClientLogin` — the
+  web UI and `/JSON-RPC` login paths, so the accounts below are reachable
+  through the device web server (code-path fact; no device was contacted).
+  (Ghidra decompilation:
+  `build/crunch-analysis/ghidra-export/decomp_cpcLoginSession.c`,
+  `decomp__ZN14AccessServices11GetUserDataEPcS0_RhRmPt.c`.)
+- **Hardcoded service accounts in `GetUserData`** (decompiled verbatim):
+  - Username `ONEDAY` (string at 0xcce2d8): authenticates at access level 5
+    with permission mask 0x708; its password buffer (BSS 0xcce28c) is zero
+    in the image — the comparison is `stricmp(password, "")`, i.e. an empty
+    password unless something initializes the BSS slot at runtime
+    (no writer found in static analysis so far).
+  - Username `CPC` (0xcce2df): password computed by
+    `AccessServices::CalculateSalPassword(month, day, 1, buf)` → access
+    level 5, mask 0x708.
+  - Username `CPC3` (0xcce2e3): `CalculateSalPassword(month, day, 0, buf)`
+    → access level 0.
+  - Otherwise: linear scan of 25 configured user records (stride 0x1e;
+    username at +0xd4, **cleartext** password at +0xe4), compared with
+    `stricmp` — case-insensitive cleartext comparison.
+- `CalculateSalPassword` (0x899a10, disassembly-verified) computes a
+  **date-derived 3-digit service PIN**:
+  `n = (month + 0x15) * (day + day mod 7) mod 1000`, formatted as
+  `CPC%03d` (type 1) or `USR%03d` (type 0; format strings at 0xd2545f /
+  0xd25457). On day-of-month 1 with license feature 0x4e25 granted it falls
+  back to `sprintf(buf, "%c", 9)`. So the CPC/CPC3 service passwords are
+  predictable from the controller date — a vendor service-login mechanism
+  baked into the firmware.
+- Local screen passwords in config are numeric 16-bit fields
   (`stConfigurationStatus.wPassword = %d`,
-  `blEnableNormalPassword`/`wNormalPassword`/`wAdvancedPassword`) — a
-  0..65535 space for the local screen passwords.
-- `AccessServices::CalculateSalPassword` (0x899a10) derives a Service Access
-  Level password; `PortLoginStackOp`, `ForceUserLogOff`, logoff timers exist.
+  `blEnableNormalPassword`/`wNormalPassword`/`wAdvancedPassword`) —
+  a 0..65535 space.
 - MD5 is present (OpenSSL 0.9.8e + ipmcrypto) but its only callers are the
   IP stack (`ipcom_random_*`, `iptcp_pkt_drain`, `ipmcrypto_md5_calculate`) —
   it is not used for password hashing at application level.
-- No hardcoded default username/password strings were found in the image;
-  the user database is configuration, not code. (Negative claim limited to
-  this image.)
 
 ## Updater / package logic (E2 facts)
 
@@ -135,8 +157,12 @@ E2 facts above. Hypotheses explicitly marked:
   complete related-code sample for any future *authorized* comparison, but it
   contains no E3/SS artifact, no SFUB key material, and no E3/SS access path.
 - Genuine-access angle (E2 fact, not an E3 path): the E2E update container
-  is unsigned and the firmware's update validation is schema-only. That is a
-  property of the E2E product only; no E3/SS inference is drawn.
+  is unsigned and the firmware's update validation is schema-only; and the
+  E2E web/JSON-RPC login accepts hardcoded service accounts (CPC/CPC3 with a
+  date-derived 3-digit PIN, ONEDAY with an empty static password buffer).
+  Both are properties of the E2E product only. Whether E3/SS inherited any
+  of this code is unknown — no E3/SS updater or rootfs has been recovered,
+  and no claim is made.
 
 ## Ghidra
 
@@ -153,8 +179,25 @@ cleanly. Headless command:
         -import $PWD/build/crunch-analysis/e2_fw-vxWorks-4.11F03-nosec.elf \
         -overwrite -analysisTimeoutPerFile 3600
 
-`ghidra_scripts/ApplyE2Symbols.py` and `ExportE2Analysis.py` are included to
-apply the recovered symbols and export inventories, xrefs, and selected
-functions. The findings above were independently verified through the symbol
-table and raw-segment disassembly; a long-running full-program analysis is not
-required for those claims. The recovered proprietary image is not redistributed.
+Post-scripts (Java; Ghidra 12.2 headless has no Jython/PyGhidra here):
+`build/crunch-analysis/ghidra_scripts/ApplyE2Symbols.java` and
+`ExportE2Analysis.java`, run with `-process e2_fw-vxWorks-4.11F03-nosec.elf
+-noanalysis -postScript ...`.
+
+Outcome:
+
+- Auto-analysis succeeded in 1,519 s; program saved as
+  `CopelandE3:/e2_fw-vxWorks-4.11F03-nosec.elf` in `ghidra/CopelandE3.gpr`.
+- Ghidra found **22,813 functions**; all **29,365 recovered symbols applied
+  (0 errors)** and saved into the project.
+- Export in `build/crunch-analysis/ghidra-export/`: `summary.txt`,
+  `interesting-functions.txt` (keyword buckets: login/auth/session/package/
+  crunch/update/license/blowfish/webs/ftp…), and decompilations
+  `decomp_*.c` for the login, package, crypto, license, remote-client and
+  Crunch functions cited in this document.
+- The decompiled `Crunch::DeCompressData` in this second, independent binary
+  matches the recovered wrapper semantics exactly (arg5==0 → verify
+  0x5aa5a55a, read declared size from stream, skip 8-byte header; else
+  headerless with arg5 as declared size; error flags at obj+0x20/0x21) —
+  third independent confirmation of the RECOVERY.md decoder semantics
+  (Unicorn, QEMU, decompilation).

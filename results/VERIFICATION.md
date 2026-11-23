@@ -100,6 +100,11 @@ repository was used.
   protocols, schema-only unsigned updates, and the signed-byte salted Blowfish
   family. A Ghidra working copy has only five header bytes zeroed; every LOAD
   segment remains byte-identical. No SFUB parser or E3/SS access path was found.
+  Ghidra completed 22,813 functions and all 29,365 recovered symbols applied
+  without errors. Decompilation of `GetUserData` confirms hardcoded ONEDAY,
+  CPC, and CPC3 service accounts, a zeroed ONEDAY password buffer, date-derived
+  3-digit CPC/CPC3 PINs, and cleartext configured-user comparison. These are
+  E2E-only findings; no E3/SS inheritance or live-device login is claimed.
 - `tools/xweb_broad_oracle.py` passed the public self-test and an independent
   OpenSSL positive-control reproduction. The campaign covered 102 Salted__
   components with 1,571,165,262 operations and zero validated hits. Recovered
