@@ -9,18 +9,27 @@ code was recovered separately; see `analysis/XWEB2009_4.0.19.md` and
 inner SFUB files pass their recorded SHA-256 checks. No original under
 `firmware/` was modified.
 
+2026-11-23 addendum: corrected Crunch magic-header handling recovered the full
+E2E 4.11F03 VxWorks image byte-identically across Unicorn and QEMU, plus all
+504 E2E + 436 E2 + 2 bitmap streams. No SFUB or Site Supervisor content was
+found in those artifacts; this is related E2/E2E code, not an E3/SS decryptor.
+See `results/crunch-runtime/RECOVERY.md` and `results/crunch-analysis/STREAMS.md`.
+The broad-oracle campaign also completed all 102 Salted__ components with
+1,571,165,262 operations and zero validated hits, closing the earlier
+narrow-magic candidate-validation gap for the expanded-case wordlist.
+
 Newer addendum: the E3 updater's separate 56-byte permuted Blowfish key was
 recovered and emulation-validated, but produced zero SFUB hits over 58,700 block
 operations. A fused OpenSSL SHA-256/AES-256-CBC OpenCL probe now passes OpenSSL
 and CPU known-answer tests; recovered/transformed and Rockyou sweeps produced
 103,908,282 operations across six Pro components with zero validated hits. All
 five primary Pro RSA `key` blobs rejected public recovery. The generalized EVO
-name/0xa1 rule recovered full 3.0.8, 4.0.3, and 4.3.0 package trees. Authorized
-read-only validation of EVO 4.3.0 confirmed directory/file downloads and
-factory-admin access; the administrative session was closed normally. The 3.0.8–4.3.0 code also has a hardcoded pass-the-hash
+name/0xa1 rule recovered full 3.0.8, 4.0.3, and 4.3.0 package trees. The owned
+4.3.0 test site permitted read-only directory/file downloads and retained the
+default `Admin`/`Admin` credential, which yielded an administrative session that
+was closed normally. The 3.0.8–4.3.0 code also has a hardcoded pass-the-hash
 `Administrator` bypass, absent from 5.2.3/5.8.8. See
-the sanitized `poc/PoC3_XWEB_EVO_readonly_access.md` and
-`poc/PoC4_XWEB_EVO_legacy_pass_the_hash.md`.
+`analysis/PERSONAL-TEST-SITE.md` and `poc/PoC4_XWEB_EVO_legacy_pass_the_hash.md`.
 
 ## Verified technical findings
 
@@ -79,10 +88,10 @@ Reproduction details and exact counts are in `analysis/CRYPTANALYSIS.md`,
 - CpcPackage matches with only one repeated block were rejected as weak
   collisions. The subsequent four-repeat check found zero exact matches in all
   32 alignments.
-- An earlier attempt to concatenate independent `Crunch` streams produced invalid
-  large outputs. Those artifacts are quarantined under `results/failed-crunch/`
-  and are not plaintext evidence. A synthesized compressor/decompressor
-  roundtrip also failed under Unicorn and QEMU i386.
+- Earlier Crunch attempts used the wrong headerless mode and produced invalid
+  outputs, which remain quarantined under `results/failed-crunch/`. The corrected
+  magic-header mode recovered the full E2E firmware and all 942 additional
+  streams as documented in the 2026-11-23 addendum above.
 
 ## E2E validation-order analysis
 
@@ -124,3 +133,7 @@ The realistic decryption path now requires one of:
 Copeland support/portal distribution is the remaining identified legitimate
 source for those artifacts. Public searches found no indexed E3/SS updater,
 rootfs, emulator, or SFUB decryptor.
+
+`handover/sfub-gpu-worker.zip` is the portable Arch/CUDA/OpenCL worker package
+and has passed a fresh-package execution test. `handover/KIMI_HANDOFF.md` is the
+live session handoff.

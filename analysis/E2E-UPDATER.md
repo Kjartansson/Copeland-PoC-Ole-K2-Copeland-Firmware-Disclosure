@@ -96,11 +96,10 @@ any decrypted output or access claim. No such hit has occurred.
 ## PlayStation-tool review
 
 The user-supplied PS5 SELF-to-ELF, self-patcher, and PS2 unpacker repositories
-were inspected statically in a separate research workspace and are not
-redistributed here; nothing was executed or built. Sony SELF uses different
-containers and keyed AES-CTR/CBC constructions, while the PS2 unpacker targets
-MIPS R5900. None matches this i386 VxWorks ELF or SFUB's deterministic aligned
-8-byte behavior. Only the general
+were cloned and inspected statically under `tools/third-party/ps-reference/`;
+nothing was executed or built. Sony SELF uses different containers and keyed
+AES-CTR/CBC constructions, while the PS2 unpacker targets MIPS R5900. None
+matches this i386 VxWorks ELF or SFUB's 8-byte ECB structure. Only the general
 PS2 technique of emulating an available unpacker, tracking written memory, and
 dumping the result is transferable as a future method; it requires a runnable
 E3/SS updater and does not supply one.
@@ -108,17 +107,24 @@ E3/SS updater and does not supply one.
 ## Crunch codec assessment
 
 The ELF contains a `Crunch` codec at `0x649920`/`0x6499f0`, with magic
-`0x5aa5a55a`. Project-local Unicorn and an independent QEMU i386 harness were
-used for bounded function-level analysis. A synthesized compressor/decompressor
-roundtrip failed under both engines. An earlier attempt to concatenate
-independent embedded streams produced invalid large outputs, not plaintext;
-those artifacts and logs are quarantined under `results/failed-crunch/`.
-`tools/e2e_crunch_unpack.py` is now restricted to one explicitly selected stream
-per run. No Crunch-derived plaintext is claimed or used for SFUB analysis.
+`0x5aa5a55a`. Earlier harnesses incorrectly passed the declared output size as
+arg5, selecting headerless mode and producing invalid output. The genuine
+wrapper uses arg5=0 for magic-header mode. With that correction, Unicorn and an
+independent QEMU harness recovered the complete 10,361,268-byte E2E 4.11F03
+VxWorks image byte-for-byte (SHA-256
+`80204568f1ddfe8202f5781657c80c50766f1c2b1070c95c244a1392bf1c7c9f`).
+The strict wrapper rejects on the final 20-byte input underrun, but all load
+segments are valid. See `results/crunch-runtime/RECOVERY.md`.
+
+A follow-up decoded all 504 E2E + 436 E2 + 2 bitmap streams with wrapper
+acceptance. Their manifests and the corrected decoder are in
+`results/crunch-analysis/`. No SFUB or Site Supervisor content was found in
+those resources. Earlier `results/failed-crunch/` artifacts remain quarantined
+wrong-mode outputs and must not be used as plaintext evidence.
 
 ## Next evidence needed
 
 The E2E code confirms vendor use of Blowfish and supplies a new implementation
 variant to test, but it does not supply an SFUB key or decryptor. Direct SFUB
 progress still requires an E3/SS updater/rootfs, an exact plaintext component
-for block-pattern matching, or new key-derivation evidence tied to SFUB.
+for ECB pattern matching, or new key-derivation evidence tied to SFUB.
